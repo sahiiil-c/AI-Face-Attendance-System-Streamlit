@@ -265,7 +265,7 @@ ip_url = ""
 if camera_type == "IP Webcam":
     ip_url = st.text_input(
         "IP Webcam URL",
-        "http://192.168.add:port"
+        "http://192.168.add:8080"
     )
 
 
