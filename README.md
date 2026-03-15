@@ -13,7 +13,7 @@ This project allows:
 
 ---
 # Works better with vs code
-##Official VS code Download link
+## Official VS code Download link
 
 [Official VS code Download Page](https://code.visualstudio.com/download)
 
