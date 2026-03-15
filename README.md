@@ -12,7 +12,13 @@ This project allows:
 * **Auto installation of required Python libraries**
 
 ---
+# Works better with vs code
+##Official VS code Download link
+[Official VS code Download Page](https://code.visualstudio.com/download)
 
+[VS code direct download for windows](https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user)
+
+---
 # Project Structure
 
 ```
