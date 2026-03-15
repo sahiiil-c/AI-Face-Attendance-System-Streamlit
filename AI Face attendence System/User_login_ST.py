@@ -60,7 +60,7 @@ if not st.session_state.logged_in:
 
     if role == "Student":
 
-        student_id = st.text_input("Enter Student ID (Example: ID_001)").strip()
+        student_id = st.text_input("Enter Student ID (Example: ID_001)","ID_").strip()
 
         if st.button("Login"):
 
@@ -130,8 +130,8 @@ if not st.session_state.logged_in:
 
     if role == "Teacher":
 
-        username = st.text_input("Username").lower().strip()
-        password = st.text_input("Password", type="password").strip()
+        username = st.text_input("Username","teacher").lower().strip()
+        password = st.text_input("Password","admin123", type="password").strip()
 
         
         if st.button("Login"):
@@ -236,7 +236,8 @@ if st.session_state.logged_in:
 
             st.subheader("Live Attendance Feed")
 
-            recent = df.sort_values("Date", ascending=False).head(10)
+            recent = student_data.sort_values("Date", ascending=False).head(10)
+
 
             for _, row in recent.iterrows():
 
@@ -317,10 +318,11 @@ if st.session_state.logged_in:
 
             st.header("📊 Teacher Dashboard")
 
-            tab1, tab2, tab3 = st.tabs([
+            tab1, tab2, tab3, tab4 = st.tabs([
                 "👨‍🏫 My Attendance",
                 "📊 Class Overview",
-                "🎓 Student Records"
+                "🎓 Student Records",
+                "📈 Monthly Comparison"
             ])
 
             # ---------------- TEACHER PERSONAL ATTENDANCE ---------------- #
@@ -538,3 +540,86 @@ if st.session_state.logged_in:
                     )
 
                     st.pyplot(fig2)
+            
+            
+            with tab4:
+
+                st.subheader("Student Attendance Comparison")
+
+                # ---------- CURRENT MONTH ----------
+                current_month = datetime.now().month
+                current_year = datetime.now().year
+
+                df_current = df[
+                    (df["Date"].dt.month == current_month) &
+                    (df["Date"].dt.year == current_year) &
+                    (df["Role"] == "student")
+                ]
+
+                # ---------- LAST MONTH ----------
+                last_month = current_month - 1
+                last_month_year = current_year
+
+                if last_month == 0:
+                    last_month = 12
+                    last_month_year -= 1
+
+                df_last = df[
+                    (df["Date"].dt.month == last_month) &
+                    (df["Date"].dt.year == last_month_year) &
+                    (df["Role"] == "student")
+                ]
+
+                chart1, chart2 = st.columns(2)
+
+                # ---------- LAST MONTH CHART ----------
+                with chart1:
+
+                    st.markdown("### Last Month Attendance&nbsp;%")
+
+                    if df_last.empty:
+                        st.warning("No data available for last month")
+                    else:
+
+                        last_summary = df_last.groupby("Name")["Attendance"].apply(
+                            lambda x: (x == "Present").sum() / len(x) * 100
+                        )
+
+                        fig1, ax1 = plt.subplots()
+
+                        last_summary.plot(
+                            kind="bar",
+                            ax=ax1
+                        )
+
+                        ax1.set_ylabel("Attendance %")
+                        ax1.set_xlabel("Students")
+                        ax1.set_title("Last Month Attendance %")
+
+                        st.pyplot(fig1)
+
+                # ---------- CURRENT MONTH CHART ----------
+                with chart2:
+
+                    st.markdown("### Current Month Attendance&nbsp;%")
+
+                    if df_current.empty:
+                        st.warning("No data available for this month")
+                    else:
+
+                        current_summary = df_current.groupby("Name")["Attendance"].apply(
+                            lambda x: (x == "Present").sum() / len(x) * 100
+                        )
+
+                        fig2, ax2 = plt.subplots()
+
+                        current_summary.plot(
+                            kind="bar",
+                            ax=ax2
+                        )
+
+                        ax2.set_ylabel("Attendance %")
+                        ax2.set_xlabel("Students")
+                        ax2.set_title("Current Month Attendance %")
+
+                        st.pyplot(fig2)
